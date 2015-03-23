@@ -1,20 +1,23 @@
 #include <iostream>
+#include <cstring>
 #include <string>
 #include <cstdio>
 
 using namespace std;
 
+const int maxn=10010;
+
 int D[10][10][2][2];
+char S[maxn];
+int dp[maxn][2];
 
 int abs(int x)
 {
     return x>0?x:-x;
 }
 
-int main()
+void load_D()
 {
-    freopen("input.in","r",stdin);
-    //freopen("output.out","w",stdout);
 
     for(int sn=0;sn<10;++sn)
         for(int tn=0;tn<10;++tn)
@@ -38,27 +41,55 @@ int main()
             ty=1;
         }
 
-        ans=abs(sx-tx)+abs(sy-ty)
+        ans=abs(sx-tx)+abs(sy-ty);
 
         D[sn][tn][0][0]=ans;
         D[sn][tn][1][1]=ans;
 
-        if(sx<tx)
+        if(sy<ty)
         {
             D[sn][tn][0][1]=ans-1;
             D[sn][tn][1][0]=ans+1;
         }
-        else if(sx>tx)
+        else if(sy>ty)
         {
             D[sn][tn][0][1]=ans+1;
             D[sn][tn][1][0]=ans-1;
         }
-        else if(sx==tx)
+        else if(sy==ty)
         {
             D[sn][tn][0][1]=ans+1;
             D[sn][tn][1][0]=ans+1;
         }
     }
+}
 
-    cout<<D[6][0][0][0]<<endl;
+int main()
+{
+    freopen("input.in","r",stdin);
+    freopen("output.out","w",stdout);
+
+    load_D();
+
+    int T;
+    scanf("%d",&T);
+
+    while(T--)
+    {
+        memset(S,0,sizeof(S));
+        memset(dp,0,sizeof(dp));
+
+        scanf("%s",S+1);
+        S[0]='1';
+
+        int n=strlen(S);
+
+        for(int i=1;i<n;++i)
+        {
+            for(int j=0;j<2;++j)
+                dp[i][j]=min( dp[i-1][0]+ D[S[i-1]-'0'][S[i]-'0'][0][j] , dp[i-1][1]+ D[S[i-1]-'0'][S[i]-'0'][1][j]);
+        }
+
+        cout<<min( dp[n-1][0],dp[n-1][1])<<endl;
+    }
 }
